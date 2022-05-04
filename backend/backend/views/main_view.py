@@ -13,7 +13,7 @@ def get_sentiment(sentence):
     """
     TODO: return the sentiment of the sentiment
     """
-    sentiment = None
+    sentiment = 'positive'
     return sentiment
 
 @main.route("/", methods=["GET", "POST"])
@@ -22,7 +22,7 @@ def home():
         response = tweets[5]
         return jsonify({"data": response})
 
-@main.route("/query", methods=["GET"])
+@main.route("/query", methods=["POST"])
 def query():
     q = request.json.get("query")
     start = request.json.get("from")

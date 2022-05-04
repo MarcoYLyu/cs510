@@ -46,6 +46,13 @@
   -webkit-line-clamp: 5;
   color: gray;
 }
+
+.sentiment {
+  display: block;
+  line-height: 6vh;
+  height: 6vh;
+  color: black;
+}
 .pagination {
   margin: 0 auto;
 }
