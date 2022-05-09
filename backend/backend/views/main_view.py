@@ -1,5 +1,7 @@
 from flask import Blueprint, request, session, jsonify
 from backend.settings import tweets
+import vaderSentiment
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 main = Blueprint("main", __name__)
 
@@ -9,12 +11,16 @@ def rank(documents, query):
     """
     return documents
 
+sid_obj = SentimentIntensityAnalyzer()
+
 def get_sentiment(sentence):
-    """
-    TODO: return the sentiment of the sentiment
-    """
-    sentiment = 'positive'
-    return sentiment
+    sentiment_dict = sid_obj.polarity_scores(sentence)
+    if sentiment_dict['compound'] >= 0.05 :
+        return "Positive"
+    elif sentiment_dict['compound'] <= - 0.05 :
+        return "Negative"
+    else :
+        return "Neutral"
 
 @main.route("/", methods=["GET", "POST"])
 def home():
