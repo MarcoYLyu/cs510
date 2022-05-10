@@ -45,7 +45,7 @@ def rank(documents, query):
     bm25 = BM25Okapi(tokenized_corpus)
     tokenized_query = query.split(" ")
 
-    return bm25.get_top_n(tokenized_query, corpus, n=20)
+    return bm25.get_top_n(tokenized_query, corpus, n=25)
 
 sid_obj = SentimentIntensityAnalyzer()
 
@@ -67,21 +67,15 @@ def home():
         return jsonify({"data": response})
 
 
-@main.route("/query", methods=["POST"])
+@main.route("/query", methods=["GET"])
 def query():
-    q = request.json.get("query")
-    start = request.json.get("from")
-    end = request.json.get("to")
-    if not start:
-        start = 0
-    if not end:
-        end = 10
+    q = request.args.get("query")
     reordered_tweets = rank(tweets, q)
 
     negative, positive, neutral = 0, 0, 0
 
     res = []
-    for tweet in reordered_tweets[start:end]:
+    for tweet in reordered_tweets:
         sentiment = get_sentiment(tweet)
         if sentiment == "Positive":
             positive += 1

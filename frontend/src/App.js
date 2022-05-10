@@ -7,20 +7,27 @@ import axios from "axios";
 function App() {
   const [searchInput, setSearchInput] = useState('');
   const [tweetList, setTweetList] = useState([]);
-  const [page, setPage] = useState(0);
-
+  const [page, setPage] = useState(1);
+  const [curPage, setCurPage] = useState([]);
+  const listLenPerPage = 10;
   useEffect(()=>{
-    tweetList.length && handleSearch()
-  } ,[page])
+    handlePagination()
+  } ,[tweetList,page])
+
+  const handlePagination = () => {
+    var start = (page-1)*listLenPerPage
+    var end = Math.min(page*listLenPerPage, tweetList.length)
+    setCurPage(tweetList.slice(start, end))
+  }
 
   const handleSearch = () => {
     if (searchInput.length === 0) {
       setTweetList([]);
     } else {
-      const obj = { "query": searchInput, "from": page * 10, "to": page*10 + 10 };
-      axios.post('/query', obj).then(
+      axios.get('/query', { params: { query: searchInput } }).then(
         res => {
-          setTweetList(res.data.data);
+          setTweetList(res.data[0].data);
+          handlePagination();
         }
       ).catch(err=>{
         console.log('!!!error',err)
@@ -36,7 +43,7 @@ function App() {
               <SearchIcon fontSize="large" />
           </IconButton>
       </div>
-      {tweetList && tweetList.map(tweet => {
+      {tweetList && curPage && curPage.map(tweet => {
           return (
               <div className="search-card">
                   <div className="search-description">
@@ -47,7 +54,7 @@ function App() {
           )
       })}
       <div className="pagination">
-          {tweetList.length > 0 && <Pagination count={10} onChange={(e, value) => setPage(value - 1)} />}
+          {tweetList.length>0 && <Pagination count={Math.ceil(tweetList.length/listLenPerPage)} onChange={(e, value) => setPage(value)} />}
       </div>
     </div>
   );
