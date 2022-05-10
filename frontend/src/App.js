@@ -2,14 +2,49 @@ import './App.css';
 import { IconButton, Pagination } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { useEffect, useState} from "react";
+import ReactEcharts from 'echarts-for-react'
 import axios from "axios";
 
 function App() {
+  const getOption = ()=> {
+    let option = {
+        title: {
+            text: 'Sentiment Analysis Result',
+            x: 'center'
+        },
+        tooltip : {
+            trigger: 'item',
+            //提示框浮层内容格式器，支持字符串模板和回调函数形式。
+            formatter: "{a} <br/>{b} : {c} ({d}%)" 
+        },
+        legend: {
+            orient: 'vertical',
+            top: 20,
+            right: 5,
+            data: ['Positive','Neutral','Negative']
+        },
+        series : [
+            {
+                name:'Percentage',
+                type:'pie',
+                data:[
+                    {value:positivePercentage, name:'Positive'},
+                    {value:neutralPercentage, name:'Neutral'},
+                    {value:negativePercentage, name:'Negative'}
+                ],
+            }
+        ]
+    }
+    return option;
+  } 
   const [searchInput, setSearchInput] = useState('');
   const [tweetList, setTweetList] = useState([]);
   const [page, setPage] = useState(1);
   const [curPage, setCurPage] = useState([]);
   const listLenPerPage = 10;
+  const [positivePercentage, setPositivePercentage] = useState(0);
+  const [neutralPercentage, setNeutralPercentage] = useState(0);
+  const [negativePercentage, setNegativePercentage] = useState(0);
   useEffect(()=>{
     handlePagination()
   } ,[tweetList,page])
@@ -27,6 +62,10 @@ function App() {
       axios.get('/query', { params: { query: searchInput } }).then(
         res => {
           setTweetList(res.data[0].data);
+          const total = res.data[1].sentiment.total*1.0;
+          setNegativePercentage(res.data[1].sentiment.negative/total)
+          setPositivePercentage(res.data[1].sentiment.positive/total)
+          setNeutralPercentage(res.data[1].sentiment.neutral/total)
           handlePagination();
         }
       ).catch(err=>{
@@ -56,6 +95,7 @@ function App() {
       <div className="pagination">
           {tweetList.length>0 && <Pagination count={Math.ceil(tweetList.length/listLenPerPage)} onChange={(e, value) => setPage(value)} />}
       </div>
+      {curPage.length>0 && <ReactEcharts option={getOption()}/>}
     </div>
   );
 }
