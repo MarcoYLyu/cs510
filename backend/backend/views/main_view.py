@@ -78,15 +78,27 @@ def query():
         end = 10
     reordered_tweets = rank(tweets, q)
 
+    negative, positive, neutral = 0, 0, 0
+
     res = []
     for tweet in reordered_tweets[start:end]:
+        sentiment = get_sentiment(tweet)
+        if sentiment == "Positive":
+            positive += 1
+        elif sentiment == "Negative":
+            negative += 1
+        else:
+            neutral += 1
+
         obj = {
             "text": tweet,
-            "sentiment": get_sentiment(tweet)
+            "sentiment": sentiment
         }
         res.append(obj)
 
-    return jsonify({"data": res})
+    sentimental_distribution = {"negative": negative, "positive": positive, "neutral": neutral, "total": len(res)}
+
+    return jsonify({"data": res}, {"sentiment": sentimental_distribution})
 
 
 @main.route("/get_all_data")
