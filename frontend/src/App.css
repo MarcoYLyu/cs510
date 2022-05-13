@@ -1,6 +1,6 @@
 .main-search {
   display: flex;
-  height: 100vh;
+  height: fit-content;
   width: 50vw;
   flex-direction: column;
   margin: 0 auto;

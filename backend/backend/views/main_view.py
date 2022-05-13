@@ -45,7 +45,7 @@ def rank(documents, query):
     bm25 = BM25Okapi(tokenized_corpus)
     tokenized_query = query.split(" ")
 
-    return bm25.get_top_n(tokenized_query, corpus, n=25)
+    return bm25.get_top_n(tokenized_query, corpus, n=100)
 
 sid_obj = SentimentIntensityAnalyzer()
 
